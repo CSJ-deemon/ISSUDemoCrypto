@@ -1,0 +1,92 @@
+﻿<UserControl x:Class="ISSUDemoCrypto.HandleRecordUI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="600">
+    <Grid Background="LightBlue">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Text="用户编号:" VerticalAlignment="Center" Margin="5"/>
+            <TextBox Name="tbox_CardId" Text="" Width="120" Margin="3" VerticalAlignment="Center"/>
+            <Button Name="btn_Query" Content="查询" VerticalAlignment="Center" Width="80" Margin="3" Click="btn_Query_Click"/>
+            <Button Name="btn_Refresh" Content="刷新" VerticalAlignment="Center" Width="80" Margin="3" Click="btn_Refresh_Click"/>
+            <Button Name="btn_Export" Content="导出" VerticalAlignment="Center" Width="80" Margin="3" Click="btn_Export_Click"/>
+            <Button Name="btn_Delete" Content="删除" VerticalAlignment="Center" Width="80" Margin="3" Click="btn_Delete_Click"/>
+        </StackPanel>
+
+        <DataGrid Name="dgrd_View"
+                  Grid.Row="1"
+                    GridLinesVisibility="All"
+                    IsReadOnly="True" 
+                    Margin="3,0"
+                    BorderThickness="0"
+                    BorderBrush="WhiteSmoke"
+                    SnapsToDevicePixels="True"
+                    SelectionMode="Extended"
+                    HorizontalGridLinesBrush="LightGray" 
+                    VerticalGridLinesBrush="LightGray"
+                    VerticalScrollBarVisibility="Auto"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False"
+                    AlternationCount="2" 
+                    Foreground="Black"
+                    Background="WhiteSmoke"
+                    AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="序号" Width="Auto" MinWidth="50"
+                                    Binding="{Binding Id}" IsReadOnly="True">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="类型" Width="Auto" MinWidth="50"
+                                    Binding="{Binding HandleType}" IsReadOnly="True">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="物理卡号" Width="Auto" MinWidth="80"
+                                    Binding="{Binding MacId}" IsReadOnly="True">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="用户编号" Width="Auto" MinWidth="80"
+                                    Binding="{Binding CardId}" IsReadOnly="True">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="识别码" Width="Auto" MinWidth="80"
+                                    Binding="{Binding SerialId}" IsReadOnly="True">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="操作金额" Width="Auto" MinWidth="70"
+                                    Binding="{Binding Money}" IsReadOnly="True">
+                </DataGridTextColumn>
+                
+                <DataGridTextColumn Header="充值后余额" Width="Auto" MinWidth="70"
+                                    Binding="{Binding Balance}" IsReadOnly="True">
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="时间" Width="Auto" MinWidth="70"
+                                    Binding="{Binding CreateTime}" IsReadOnly="True">
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Text="每页条数:" VerticalAlignment="Center" Margin="5"/>
+            <ComboBox Name="cbox_OnePageNums" VerticalAlignment="Center" Margin="5,0" Width="60">
+                <ComboBoxItem IsSelected="True">15</ComboBoxItem>
+                <ComboBoxItem>30</ComboBoxItem>
+                <ComboBoxItem>50</ComboBoxItem>
+                <ComboBoxItem>100</ComboBoxItem>
+            </ComboBox>
+            <Button Name="btn_LastPage"  Content="上一页" VerticalAlignment="Center" Width="60" Click="btn_LastPage_Click"/>
+            <TextBlock Name="tblk_PageId" Text="0/0" VerticalAlignment="Center" Margin="10"/>
+            <Button Name="btn_NextPage" Content="下一页" VerticalAlignment="Center" Width="60" Click="btn_NextPage_Click"/>
+            <TextBox Name="tbox_JumpId" Text="1" VerticalAlignment="Center" Width="40" Margin="3"/>
+            <Button Name="btn_JumpPage" Content="跳转" VerticalAlignment="Center" Width="60" Margin="3" Click="btn_JumpPage_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,468 @@
+﻿<Window x:Class="ISSUDemoCrypto.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="卡片管理-加密版V1.6-20190710" Height="560" Width="820" xmlns:my="clr-namespace:ISSUDemoCrypto">
+    <Window.Resources>
+        <Style x:Key="myTextblockStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="Blue"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="Red"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Background="LightGray">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="35"/>
+        </Grid.RowDefinitions>
+
+        <TabControl>
+            <TabItem Header="卡片管理" Height="30" Name="tbitm_MotherCard">
+                <Grid Background="LightBlue">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="200"/>
+                        <RowDefinition Height="100"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <GroupBox Header="管理" Margin="3" BorderBrush="Green" Name="gbox_CardManager">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="5,0,0,0">
+                                <TextBlock Text="卡号:" Width="60" VerticalAlignment="Center"/>
+                                <TextBox Text="" Name="tblk_ManagerCardId" Margin="5" Width="100" VerticalAlignment="Center"/>
+                                <TextBlock Text="读卡" Name="tblk_ManagerReadCard"  Width="30" Margin="3"  HorizontalAlignment="Center" Style="{StaticResource myTextblockStyle}"
+                                   Cursor="Hand"  TextDecorations="UnderLine" VerticalAlignment="Center"
+                                           MouseDown="tblk_ManagerReadCard_MouseDown"/>
+                                <TextBlock Text="转换" Name="tblk_HexToDec"  Width="30" Margin="3"  HorizontalAlignment="Center" Style="{StaticResource myTextblockStyle}"
+                                   Cursor="Hand"  TextDecorations="UnderLine" VerticalAlignment="Center"
+                                           MouseDown="tblk_HexToDec_MouseDown"/>
+                                <Button Content="录入" Name="btn_Record" Width="30" Margin="3"  
+                                        HorizontalAlignment="Center" VerticalAlignment="Center" Click="btn_Record_Click"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="5,0,0,0">
+                                <TextBlock Text="卡片类型:" Width="60" VerticalAlignment="Center"/>
+                                <RadioButton Name="rdbtn_CardPwd" Content="密钥卡"
+                                             VerticalAlignment="Center" Width="70" IsChecked="True" Margin="5"/>
+                                <RadioButton Name="rdbtn_CardBinding" Content="绑定卡"
+                                             VerticalAlignment="Center" Width="60"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="5,0,0,0">
+                                <TextBlock Text="管理类型:" Width="60" VerticalAlignment="Center"/>
+                                <ComboBox Name="cbox_ManagerType" Margin="3,5,3,5" Width="120">
+                                    <ComboBoxItem>母卡</ComboBoxItem>
+                                    <ComboBoxItem>超级管理员卡</ComboBoxItem>
+                                    <ComboBoxItem>管理员卡</ComboBoxItem>
+                                    <ComboBoxItem IsSelected="True">空白卡/用户卡</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="5,0,0,0">
+                                <TextBlock Text="基因:" Width="60" VerticalAlignment="Center"/>
+                                <TextBox Name="tbox_ManagerGene" Margin="3,5,3,5" Width="120"></TextBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Row="4" Margin="5,0,0,0">
+                                <TextBlock Width="48"/>
+                                <Button Content="建卡" Name="btn_ManagerCreate"  Width="70" Margin="3,5,3,5" Click="btn_ManagerCreate_Click" />
+                                <Button Content="销卡" Name="btn_ManagerDelete" Width="70" Margin="3,5,3,5" Click="btn_ManagerDelete_Click"/>
+                            </StackPanel>
+
+                            <TextBlock Grid.Row="5" Name="tblk_ManagerTip" Foreground="Red" 
+                                       HorizontalAlignment="Center"  VerticalAlignment="Center" Margin="5"/>
+                        </Grid>
+
+                    </GroupBox>
+                    <GroupBox Header="调试" Grid.Row="1"  BorderBrush="Green" Margin="3" Name="gbox_Debug">
+                        <WrapPanel Orientation="Horizontal">
+                            <Button Name="btn_CreateMother"  Content="母卡" Width="70" Height="28"  Margin="3" Click="btn_CreateMother_Click" />
+                            <Button Name="btn_CreateBindingMother"  Content="绑定母卡"  Height="28" Width="70" Margin="3" Click="btn_CreateBindingMother_Click" />
+                            <Button Name="btn_CreateEmpty" Content="空白卡" Width="70" Height="28"  Margin="3" Click="btn_CreateEmpty_Click" />
+                            <Button Name="btn_Delete" Content="销卡" Width="70"  Height="28" Margin="3" Click="btn_Delete_Click"/>
+                        </WrapPanel>
+                    </GroupBox>
+
+                    <GroupBox Grid.Row="2" Name="gbox_Setting"  Header="配置" BorderBrush="Green" Margin="3">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="充电通道:" VerticalAlignment="Center" Width="60"/>
+                                <ComboBox Name="cbox_ChargerChannel"  Margin="3,5,3,5" Width="120">
+                                    <ComboBoxItem IsSelected="True">单路</ComboBoxItem>
+                                    <ComboBoxItem>双路</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                <TextBlock Text="充电模式:" VerticalAlignment="Center" Width="60"/>
+                                <ComboBox Name="cbox_ChargerMode" Margin="3,5,3,5" Width="120">
+                                    <ComboBoxItem IsSelected="True">RFID</ComboBoxItem>
+                                    <ComboBoxItem Content="即插即充"/>
+				    <ComboBoxItem Content="16A配置卡" />
+                                    <ComboBoxItem Content="32A配置卡" />
+                                    <ComboBoxItem Content="LED正常显示配置卡" />
+                                    <ComboBoxItem Content="灯带配置卡" />
+                                    <ComboBoxItem Content="关闭网络通信卡" />
+                                    <ComboBoxItem Content="2G_ZTE通信开通卡" />
+                                    <ComboBoxItem Content="4G_N710通信开通卡" />
+                                    <ComboBoxItem Content="以太网配置卡" />
+                                    <ComboBoxItem Content="网络CAN通信开通卡" />
+                                    <ComboBoxItem Content="2G_SIM800开通卡" />
+                                    <ComboBoxItem Content="4G_N720开通卡" />
+                                    <ComboBoxItem Content="恢复出厂卡" />
+                                    <ComboBoxItem Content="CP国标标准配置卡" />
+                                    <ComboBoxItem Content="CP宽范围配置卡" />
+                                    <ComboBoxItem Content="CAN波特率设置卡50K" />
+                                    <ComboBoxItem Content="CAN波特率设置卡125K" />
+                                    <ComboBoxItem Content="CAN波特率设置卡250K" />
+                                    <ComboBoxItem Content="BCD码显示" />
+                                    <ComboBoxItem Content="ASC码显示" />
+                                    <ComboBoxItem Content="开通RFID加密模式" />
+                                    <ComboBoxItem Content="关闭RFID加密模式" />
+                                    <ComboBoxItem Content="开通刷卡基因认证功能" />
+                                    <ComboBoxItem Content="关闭刷卡基因认证功能" />
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Row="2">
+                                <TextBlock Width="60"/>
+                                <Button Name="btn_Setting" Content="确定" Margin="3,5,3,5" Width="120" Click="btn_Setting_Click" />
+                            </StackPanel>
+                        </Grid>
+                    </GroupBox>
+
+                    <GroupBox Header="查看" Margin="3" Grid.Column="1" Grid.RowSpan="3"  BorderBrush="Green" Name="gbox_CardDataView">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="30"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Name="tbox_ReadAdd" Content="读卡信息" Margin="3" Width="70" Click="tbox_ReadAdd_Click"/>
+                                <Button Name="tbox_CleanAll" Content="清空" Margin="3" Width="70" Click="tbox_CleanAll_Click"/>
+                            </StackPanel>
+
+                            <TextBox Name="tbox_CardData" Grid.Row="1" Margin="3" FontFamily="Consolas" FontSize="14"></TextBox>
+                            <TextBox Name="tbox_CardIds" Grid.Row="2" Margin="3" />
+                            <StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Right" Margin="3">
+                                <TextBlock Text="当前条数:" Margin="3" VerticalAlignment="Center"/>
+                                <TextBlock Name="tblk_CardNum"  Text="0" Margin="3" VerticalAlignment="Center" Width="50"/>
+                                <Button Name="tbox_SaveToFile" Content="保存" VerticalAlignment="Center" Width="60" Click="tbox_SaveToFile_Click"/>
+                            </StackPanel>
+                            
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="卡信息" Height="30" Name="tbitm_AdminCard">
+                <Grid Background="LightBlue">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="480"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <GroupBox Header="数据" BorderBrush="Green" Margin="3">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Width="220">
+                                <TextBlock Text="卡号:" Width="55" VerticalAlignment="Center"/>
+                                <TextBlock Width="120" Name="tblk_CardId"  Margin="5"/>
+                                <TextBlock Text="读卡" Name="tblk_ReadCard" TextDecorations="UnderLine" VerticalAlignment="Center"
+                                          MouseDown="tblk_ReadCard_MouseDown"  Cursor="Hand" Style="{StaticResource myTextblockStyle}" Margin="3"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1" Width="220">
+                                <TextBlock Text="卡类型:" Width="55" VerticalAlignment="Center"/>
+                                <ComboBox Name="cbox_CardType"  Margin="5" Width="120">
+                                    <ComboBoxItem>空白卡</ComboBoxItem>
+                                    <ComboBoxItem>母卡</ComboBoxItem>
+                                    <ComboBoxItem>超级管理员卡</ComboBoxItem>
+                                    <ComboBoxItem>管理员卡</ComboBoxItem>
+                                    <ComboBoxItem IsSelected="True">普通卡</ComboBoxItem>
+                                    <ComboBoxItem>工程启停卡</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0" Width="220">
+                                <TextBlock Text="基因:" Width="55" VerticalAlignment="Center"/>
+                                <TextBox Width="120" Name="tbox_Gene" Margin="5"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1" Width="220">
+                                <TextBlock Text="计费类型:" Width="55" VerticalAlignment="Center"/>
+                                <ComboBox Name="cbox_Acount" Margin="5" Width="120">
+                                    <ComboBoxItem>不计费</ComboBoxItem>
+                                    <ComboBoxItem>计费</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="0" Width="220">
+                                <TextBlock Text="使用类型:" Width="55" VerticalAlignment="Center"/>
+                                <ComboBox Name="cbox_UsrType" Margin="5" Width="120">
+                                    <ComboBoxItem>面值卡</ComboBoxItem>
+                                    <ComboBoxItem>充值卡</ComboBoxItem>
+                                    <ComboBoxItem>联网卡</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="1" Width="220">
+                                <TextBlock Text="锁卡标志:" Width="55" VerticalAlignment="Center"/>
+                                <ComboBox Name="cbox_Lock" Margin="5" Width="120">
+                                    <ComboBoxItem>解锁</ComboBoxItem>
+                                    <ComboBoxItem>上锁</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="0" Width="220">
+                                <TextBlock Text="密码标志:" Width="55" VerticalAlignment="Center"/>
+                                <ComboBox Name="cbox_Psw" Margin="5" Width="120">
+                                    <ComboBoxItem>不启用</ComboBoxItem>
+                                    <ComboBoxItem>启用</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="4" Grid.Column="1" Width="220">
+                                <TextBlock Text="交易标志:" Width="55" VerticalAlignment="Center"/>
+                                <ComboBox Name="cbox_Payment" Margin="5" Width="120">
+                                    <ComboBoxItem>不启用</ComboBoxItem>
+                                    <ComboBoxItem>启用</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="4" Grid.Column="0" Width="220">
+                                <TextBlock Text="用户编号:" Width="55" VerticalAlignment="Center"/>
+                                <TextBox Name="tbox_UsrId"  Width="120" Margin="5"></TextBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="1" Width="220">
+                                <TextBlock Text="用户密码:" Width="55" VerticalAlignment="Center"/>
+                                <TextBox Name="tbox_UsrPwd"  Width="120" Margin="5"></TextBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="0" Width="220">
+                                <TextBlock Text="用户余额:" Width="55" VerticalAlignment="Center"/>
+                                <TextBox Name="tbox_Banlance" Width="120" Margin="5"></TextBox>
+                                <TextBlock Text="元" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="6" Grid.Column="1" Width="220">
+                                <TextBlock Text="电价:" Width="55" VerticalAlignment="Center"/>
+                                <TextBox Name="tbox_ElectmentPrice" Width="120" Margin="5"></TextBox>
+                                <TextBlock Text="元/度" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="6" Grid.Column="0" Width="220">
+                                <TextBlock Text="停车价:" Width="55" VerticalAlignment="Center"/>
+                                <TextBox Name="tbox_StopCarPrice" Width="120" Margin="5"></TextBox>
+                                <TextBlock Text="元/度" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="0" Width="220">
+                                <TextBlock Text="起始时间:" Width="55" VerticalAlignment="Center"/>
+                                <TextBlock Name="tblk_StartTime" Width="120" Margin="5"></TextBlock>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1" Width="220">
+                                <TextBlock Name="tblk_DevId" Text="设备编号:" Width="55" VerticalAlignment="Center"/>
+                                <TextBlock Width="120" Margin="5"></TextBlock>
+                            </StackPanel>
+                        </Grid>
+
+                    </GroupBox>
+
+                    <GroupBox Header="操作" Grid.Column="1" BorderBrush="Green" Margin="3" Name="gbox_Handle">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="0">
+                                <Button Content="写普通卡" Name="btn_ModifiCard"  Margin="5" Width="70" Click="btn_CreateCard_Click" />
+                                <Button Content="销普通卡" Name="btn_DeleteCard" Margin="5" Width="70" Click="btn_DeleteCard_Click" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="1">
+                                <Button Content="增加密码" Name="btn_AddPwd"  Margin="5" Width="70" Click="btn_AddPwd_Click"/>
+                                <Button Content="清除密码" Name="btn_CleanPwd" Margin="5" Width="70" Click="btn_CleanPwd_Click"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="2">
+                                <TextBlock Text="充值:" Width="40" VerticalAlignment="Center"/>
+                                <TextBox Width="100" Name="tbox_InputMoney"  Margin="5"/>
+                                <TextBlock Text="元" Width="20" VerticalAlignment="Center"/>
+                                <Button Content="确定" Name="btn_InputMoney"  Width="60" Margin="5" Click="btn_InputMoney_Click" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="3">
+                                <TextBlock Text="消费:" Width="40" VerticalAlignment="Center"/>
+                                <TextBox Width="100" Name="tbox_OutputMoney"  Margin="5"/>
+                                <TextBlock Text="元" Width="20" VerticalAlignment="Center"/>
+                                <Button Content="确定" Name="btn_OutputMoney" Width="60" Margin="5" Click="btn_OutputMoney_Click" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="4">
+                                <TextBlock Text="绑定卡:" Width="40" VerticalAlignment="Center"/>
+                                <TextBox Width="100" Name="tbox_BandingGene" Margin="5"/>
+                                <TextBlock Text="" Width="20" VerticalAlignment="Center"/>
+                                <Button Content="确定" Name="btn_CreateBanding" Width="60" Margin="5" Click="btn_CreateBanding_Click"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="5">
+                                <TextBlock Text="密钥卡:" Width="40" VerticalAlignment="Center"/>
+                                <TextBox Width="100" Name="tbox_KeyGene" Margin="5"/>
+                                <TextBlock Text="" Width="20" VerticalAlignment="Center"/>
+                                <Button Content="确定" Name="btn_CreateKey" Width="60" Margin="5" Click="btn_CreateKey_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="配置卡" Height="30">
+                <Grid Background="LightBlue">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="服务器地址: " VerticalAlignment="Center" Width="70"/>
+                            <TextBox Width="160" Margin="3" Name="tbox_SrvAddress"/>
+                            <Button Content="设置" Margin="3" Width="60" Name="btn_SettingSrv" Click="btn_SettingSrv_Click" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Grid.Row="1">
+                            <TextBlock Text="充电桩地址: " VerticalAlignment="Center" Width="70"/>
+                            <ComboBox Margin="3" Width="40" Name="cbox_Channel">
+                                <ComboBoxItem IsSelected="True">A</ComboBoxItem>
+                                <ComboBoxItem>B</ComboBoxItem>
+                            </ComboBox>
+                            <TextBox Width="114" Margin="3" Name="tbox_ChargeId" />
+                            <Button Content="设置" Margin="3" Width="60" Name="btn_SettingId" Click="btn_SettingId_Click" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Grid.Row="2">
+                            <TextBlock Text="通信方式: " VerticalAlignment="Center" Width="70"/>
+                            <ComboBox Margin="3" Width="160" Name="cbox_CommType">
+                                <ComboBoxItem IsSelected="True">无</ComboBoxItem>
+                                <ComboBoxItem>2G</ComboBoxItem>
+                                <ComboBoxItem>4G</ComboBoxItem>
+                                <ComboBoxItem>以太网</ComboBoxItem>
+                            </ComboBox>
+                            <Button Content="设置" Margin="3" Width="60" Name="btn_SettingCommType" Click="btn_SettingCommType_Click"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Grid.Row="3">
+                            <TextBlock Text="电价方式: " VerticalAlignment="Center" Width="70"/>
+                            <ComboBox Margin="3" Width="60" Name="cbox_PricesType" SelectionChanged="cbox_PricesType_SelectionChanged">
+                                <ComboBoxItem IsSelected="True">卡电价</ComboBoxItem>
+                                <ComboBoxItem>桩电价</ComboBoxItem>
+                            </ComboBox>
+                            <TextBox Name="tbox_Prices" Text="1.00" VerticalAlignment="Center" Width="61" Margin="5"/>
+                            <TextBlock Text="度/元" VerticalAlignment="Center" />
+                            <Button Content="设置" Margin="3" Width="60" Name="btn_SettingPrices" Click="btn_SettingPrices_Click"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Grid.Row="4">
+                            <TextBlock Text="卡类型:" VerticalAlignment="Center" Width="70"/>
+                            <ComboBox Margin="3" Width="160" Name="cbox_CardType0">
+                                <ComboBoxItem IsSelected="True">启停卡</ComboBoxItem>
+                            </ComboBox>
+                            <Button Content="设置" Margin="3" Width="60" Name="btn_SettingType0" Click="btn_SettingType0_Click"/>
+                        </StackPanel>
+
+                    </Grid>
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="操作记录" Height="30">
+                <my:HandleRecordUI x:Name="myUI_HandleRec" />
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="1"  Orientation="Horizontal" HorizontalAlignment="Right">
+
+            <Label Name="tbox_TipCard" Width="240"  VerticalAlignment="Center" HorizontalContentAlignment="Center"  Foreground="Red"/>
+            <TextBlock Width="50"/>
+            <TextBlock Text="串口: " VerticalAlignment="Center" Width="30"/>
+            <ComboBox Name="cbox_COM" IsEditable="True" Margin="5" Width="80" DropDownOpened="cbox_COM_DropDownOpened" />
+            <TextBlock Text="波特率: " Width="40" Margin="3"  Foreground="Black" VerticalAlignment="Center"></TextBlock>
+            <ComboBox Name="cbox_Bandrate" Width="80" IsEditable="True" Margin="5">
+                <ComboBoxItem Content="2400"/>
+                <ComboBoxItem Content="4800"/>
+                <ComboBoxItem Content="9600"/>
+                <ComboBoxItem Content="115200" IsSelected="True"/>
+            </ComboBox>
+
+            <Button Content="打开串口" Margin="5" Width="70" Name="btn_OpenCom" Click="btn_OpenCom_Click"/>
+            <ComboBox Name="cbox_EmMode" Width="60" Margin="5" SelectionChanged="cbox_EmMode_SelectionChanged">
+                <ComboBoxItem IsSelected="True">普通版</ComboBoxItem>
+                <ComboBoxItem>加密版</ComboBoxItem>
+            </ComboBox>
+            <Button Content="刷卡鉴权" Name="btn_CheckPower" Margin="5" Click="btn_CheckPower_Click" />
+        </StackPanel>
+    </Grid>
+</Window>
