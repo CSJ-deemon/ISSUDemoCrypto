@@ -1,4 +1,10 @@
-bin/
 obj/
 发布/
 发布.zip
+*.rar
+*.exe
+*.application
+*.manifest
+*.zip
+*.pdb
+*.deploy
