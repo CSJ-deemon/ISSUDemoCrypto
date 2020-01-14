@@ -9,5 +9,3 @@ obj/
 *.pdb
 *.deploy
 *.sqlite
-*.csproj
-*.suo
