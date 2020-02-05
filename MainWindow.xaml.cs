@@ -43,7 +43,7 @@ namespace ISSUDemoCrypto
             //gbox_CardDataView.Visibility = Visibility.Visible;
             //gbox_Debug.Visibility = Visibility.Visible;
             //gbox_Setting.Visibility = Visibility.Visible;
-            cbox_ManagerType.Items.Clear();
+            //cbox_ManagerType.Items.Clear();
         }
 
 
@@ -334,7 +334,11 @@ namespace ISSUDemoCrypto
             CardInfo card = new CardInfo();
             object obj = (object)card;
             if (M50CardHelper.GetCardInfo(ref obj) == false)
+            {
+                MessageBox.Show("读卡失败");
                 return;
+            }
+
 
             tblk_CardId.Text = card.strId;
 
@@ -414,7 +418,7 @@ namespace ISSUDemoCrypto
 
         private void tbox_ReadAdd_Click(object sender, RoutedEventArgs e)
         {
-            tbox_CardData.Text = "";
+            //tbox_CardData.Text = "";
 
             byte[] Datas0 = new byte[64];
             if (M50CardHelper.ReadData(0x01, ref Datas0) == false)
@@ -434,7 +438,7 @@ namespace ISSUDemoCrypto
                     strTemp += " ";
                 strTemp += Datas0[i].ToString("X2") + " ";
             }
-            tbox_CardData.Text = strTemp;
+           // tbox_CardData.Text = strTemp;
 
             strTemp = "\r\n\r\n";
             for (byte i = 0; i < 64; i++)
@@ -445,7 +449,7 @@ namespace ISSUDemoCrypto
                     strTemp += " ";
                 strTemp += Datas1[i].ToString("X2") + " ";
             }
-            tbox_CardData.Text += strTemp;
+            //tbox_CardData.Text += strTemp;
 
             string strCardType = GetCardType(Datas0[0]);
             string strGene = Encoding.ASCII.GetString(Datas0, 1, 8);
@@ -519,44 +523,44 @@ namespace ISSUDemoCrypto
             strTemp = string.Format("\r\n==========================================\r\n卡类型：{0},\r\n基因:{1},\r\n计费类型:{2},\r\n使用类型:{3},\r\n锁卡标志:{4},\r\n密码标志:{5},\r\n交易标志:{6},\r\n用户编号:{7},\r\n用户密码:{8},\r\n电价:{9},\r\n停车场:{10},\r\n余额:{11},\r\n启动时间:{12},\r\n设备编号:{13},\r\n",
                 strCardType, strGene, strAccoutFlag, strUesFlag, strLockFlag, strPwdFlag, strPaymentFlag, strUsrId, strPwd, strPrices, strStopPrices, strBanlance, strStartTime, strDevId);
 
-            tbox_CardData.Text += strTemp;
+            //tbox_CardData.Text += strTemp;
         }
 
         private void tbox_CleanAll_Click(object sender, RoutedEventArgs e)
         {
-            tbox_CardData.Text = "";
+            //tbox_CardData.Text = "";
         }
 
         private void tblk_ManagerReadCard_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            CardInfo card = new CardInfo();
-            object obj = (object)card;
-            if (M50CardHelper.GetCardInfo(ref obj) == false)
-            {
-                tblk_ManagerTip.Text = "读卡失败！ 非本系统卡";
-                rdbtn_CardPwd.IsChecked = true;
-                tbox_Gene.Text = "";
-                cbox_CardType.SelectedIndex = -1;
-                return;
-            }
+            //CardInfo card = new CardInfo();
+            //object obj = (object)card;
+            //if (M50CardHelper.GetCardInfo(ref obj) == false)
+            //{
+            //    tblk_ManagerTip.Text = "读卡失败！ 非本系统卡";
+            //    rdbtn_CardPwd.IsChecked = true;
+            //    tbox_Gene.Text = "";
+            //    cbox_CardType.SelectedIndex = -1;
+            //    return;
+            //}
 
-            tbox_ManagerGene.Text = Encoding.ASCII.GetString(card.Gens, 0, 8);
-            tblk_ManagerCardId.Text = card.strId;
+            //tbox_ManagerGene.Text = Encoding.ASCII.GetString(card.Gens, 0, 8);
+            //tblk_ManagerCardId.Text = card.strId;
 
-            if (card.CardType < (byte)CardType.Card_Type_Binding_Mother)
-                rdbtn_CardPwd.IsChecked = true;
-            else rdbtn_CardBinding.IsChecked = true;
+            //if (card.CardType < (byte)CardType.Card_Type_Binding_Mother)
+            //    rdbtn_CardPwd.IsChecked = true;
+            //else rdbtn_CardBinding.IsChecked = true;
         }
 
         private void btn_ManagerCreate_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                if (string.IsNullOrEmpty(tbox_ManagerGene.Text) == true || tbox_ManagerGene.Text.Length !=8)
-                {
-                    throw new Exception("基因输入错误！\r\n不能为空，且只能为8个长度!");
-                }
-                byte[] genes = Encoding.ASCII.GetBytes(tbox_ManagerGene.Text.Trim());
+                //if (string.IsNullOrEmpty(tbox_ManagerGene.Text) == true || tbox_ManagerGene.Text.Length !=8)
+                //{
+                //    throw new Exception("基因输入错误！\r\n不能为空，且只能为8个长度!");
+                //}
+                //byte[] genes = Encoding.ASCII.GetBytes(tbox_ManagerGene.Text.Trim());
 
                 if (IsCheckPowerOk == false)
                     throw new Exception("鉴权失败，请刷卡重新鉴权!");
@@ -575,7 +579,7 @@ namespace ISSUDemoCrypto
 
                 CardInfo newCard = new CardInfo();
                 newCard.CardType = type;
-                genes.CopyTo(newCard.Gens, 0);
+                //genes.CopyTo(newCard.Gens, 0);
                 //if (type == (byte)CardType.Card_Type_Super_Admin ||
                 //    type == (byte)CardType.Card_Type_Binding_Super)
                 //{
@@ -610,23 +614,23 @@ namespace ISSUDemoCrypto
 
         private byte GetUsrCreateCardType()
         {
-            bool isPwdCard = (bool)rdbtn_CardPwd.IsChecked;
+            //bool isPwdCard = (bool)rdbtn_CardPwd.IsChecked;
             byte type = 0xff;
-            if (cbox_ManagerType.Text.Equals("超级管理员卡"))//创建超级管理员卡;
-            {
-                type = isPwdCard ? (byte)CardType.Card_Type_Super_Admin : (byte)CardType.Card_Type_Binding_Super;
-            }
-            else if (cbox_ManagerType.Text.Equals("管理员卡"))//创建管理员卡;
-            {
-                type = isPwdCard ? (byte)CardType.Card_Type_Admin : (byte)CardType.Card_Type_Binding_Admin;
-            }
-            else if (cbox_ManagerType.Text.Equals("用户卡"))//创建空白卡;
-            {
-                if (isPwdCard == false)//用户卡
-                {
-                    type = (byte)CardType.Card_Type_Binding_Usr;
-                }
-            }
+            //if (cbox_ManagerType.Text.Equals("超级管理员卡"))//创建超级管理员卡;
+            //{
+            //    type = isPwdCard ? (byte)CardType.Card_Type_Super_Admin : (byte)CardType.Card_Type_Binding_Super;
+            //}
+            //else if (cbox_ManagerType.Text.Equals("管理员卡"))//创建管理员卡;
+            //{
+            //    type = isPwdCard ? (byte)CardType.Card_Type_Admin : (byte)CardType.Card_Type_Binding_Admin;
+            //}
+            //else if (cbox_ManagerType.Text.Equals("用户卡"))//创建空白卡;
+            //{
+            //    if (isPwdCard == false)//用户卡
+            //    {
+            //        type = (byte)CardType.Card_Type_Binding_Usr;
+            //    }
+            //}
             return type;
         }
 
@@ -753,28 +757,25 @@ namespace ISSUDemoCrypto
                 return (type.ToString("X2") + " 绑定用户卡");
             else return (type.ToString("X2") + " 未知");
         }
-
+        /*
+         * 鉴权
+         * 老版:通过建立母卡->超级管理员->管理员->普通卡
+         * 新版:通过秘钥卡进行鉴权->普通卡 
+         */
         public void CheckPowerRefreshUi(CardInfo card)
         {
-            cbox_ManagerType.Items.Clear();
-            rdbtn_CardPwd.IsEnabled = false;
-            rdbtn_CardBinding.IsEnabled = false;
             IsCheckPowerOk = false;
 
             string strResult = "";
             if (card.CardType == (byte)CardType.Card_Type_Mother)
             {
                 strResult = "成功, [母卡]";
-                rdbtn_CardPwd.IsEnabled = true;
                 IsCheckPowerOk = true;
-                cbox_ManagerType.Items.Add(new ComboBoxItem { Content = "超级管理员卡" });
             }
             else if (card.CardType == (byte)CardType.Card_Type_Super_Admin)
             {
                 strResult = "成功, [超级管理员卡]";
                 IsCheckPowerOk = true;
-                rdbtn_CardPwd.IsEnabled = true;
-                cbox_ManagerType.Items.Add(new ComboBoxItem { Content = "管理员卡" });
             }
             else if (card.CardType == (byte)CardType.Card_Type_Admin)
             {
@@ -785,23 +786,16 @@ namespace ISSUDemoCrypto
             {
                 strResult = "成功, [绑定母卡]";
                 IsCheckPowerOk = true;
-                rdbtn_CardBinding.IsEnabled = true;
-                cbox_ManagerType.Items.Add(new ComboBoxItem { Content = "超级管理员卡" });
-                cbox_ManagerType.Items.Add(new ComboBoxItem { Content = "用户卡" });
             }
             else if (card.CardType == (byte)CardType.Card_Type_Binding_Super)
             {
                 strResult = "成功, [绑定超级管理员卡]";
                 IsCheckPowerOk = true;
-                rdbtn_CardBinding.IsEnabled = true;
-                cbox_ManagerType.Items.Add(new ComboBoxItem { Content = "管理员卡" });
             }
             else if (card.CardType == (byte)CardType.Card_Type_Binding_Admin)
             {
                 strResult = "成功, [绑定管理员卡]";
                 IsCheckPowerOk = true;
-                rdbtn_CardBinding.IsEnabled = true;
-                cbox_ManagerType.Items.Add(new ComboBoxItem { Content = "用户卡" });
             }
             else
             {
@@ -842,14 +836,14 @@ namespace ISSUDemoCrypto
                 //newCard.Gens[0] = card.Gens[0];
                 //newCard.Gens[1] = card.Gens[1];
                 
-                if(string.IsNullOrEmpty(tbox_ManagerGene.Text))
-                { 
-                    card.Gens.CopyTo(newCard.Gens, 0);
-                }
-                else
-                {
-                    newCard.Gens = Encoding.ASCII.GetBytes(tbox_ManagerGene.Text.Trim());
-                }
+                //if(string.IsNullOrEmpty(tbox_ManagerGene.Text))
+                //{ 
+                //    card.Gens.CopyTo(newCard.Gens, 0);
+                //}
+                //else
+                //{
+                //    newCard.Gens = Encoding.ASCII.GetBytes(tbox_ManagerGene.Text.Trim());
+                //}
 
                 newCard.CardType = (byte)CardType.Card_Type_Setting;
                 newCard.Acount = Convert.ToByte(cbox_ChargerChannel.SelectedIndex);
@@ -1291,36 +1285,6 @@ namespace ISSUDemoCrypto
             }
         }
 
-        private void tblk_HexToDec_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            string strCardId = tblk_ManagerCardId.Text;
-            UInt32 nId = Convert.ToUInt32(strCardId, 16);
-            tblk_ManagerCardId.Text = nId.ToString("0000000000");
-        }
-
-        private void btn_Record_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                string strCardId = tblk_ManagerCardId.Text;
-                UInt32 nId = Convert.ToUInt32(strCardId, 16);
-                string strText = string.Format("{0}\t{1}", strCardId, nId);
-                if (tbox_CardIds.Text.Contains(strText) == false)
-                {
-                    tbox_CardIds.AppendText(strText + "\r\n");
-                }
-                tblk_CardNum.Text = (tbox_CardIds.LineCount - 1).ToString();
-            }
-            catch (System.Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void tbox_SaveToFile_Click(object sender, RoutedEventArgs e)
-        {
-            File.WriteAllText("cardId.txt", tbox_CardIds.Text);
-        }
 
         private void btn_CreateBanding_Click(object sender, RoutedEventArgs e)
         {
