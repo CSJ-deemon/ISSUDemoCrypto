@@ -237,6 +237,7 @@
                                     <ComboBoxItem Content="即插即充"/>
                                     <ComboBoxItem Content="16A配置卡" />
                                     <ComboBoxItem Content="32A配置卡" />
+                                    <ComboBoxItem Content="36A配置卡" />
                                     <ComboBoxItem Content="LED正常显示配置卡" />
                                     <ComboBoxItem Content="灯带配置卡" />
                                     <ComboBoxItem Content="关闭网络通信卡" />
