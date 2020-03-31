@@ -208,12 +208,6 @@
                                 <Button Content="确定" Name="btn_CreateBanding" Width="60" Margin="5" Click="btn_CreateBanding_Click"/>
                             </StackPanel>
 
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="5">
-                                <TextBlock Text="密钥卡:" Width="40" VerticalAlignment="Center"/>
-                                <TextBox Width="100" Name="tbox_KeyGene" Margin="5"/>
-                                <TextBlock Text="" Width="20" VerticalAlignment="Center"/>
-                                <Button Content="确定" Name="btn_CreateKey" Width="60" Margin="5" Click="btn_CreateKey_Click"/>
-                            </StackPanel>
                         </Grid>
                     </GroupBox>
 
