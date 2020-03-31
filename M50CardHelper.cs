@@ -238,7 +238,7 @@ namespace ISSUDemoCrypto
             }
             else if (card.CardType == (byte)CardType.Card_Type_Setting)
             {
-                for (byte i = 0; i < 2; i++)
+                for (byte i = 0; i < 8; i++)
                     Temp0[1 + i] = card.Gens[i];
                 Temp0[9] = card.Acount;
                 Temp0[10] = card.UsrType;
@@ -259,8 +259,10 @@ namespace ISSUDemoCrypto
             }
             else if (card.CardType == (byte)CardType.Card_Type_StartStop)
             {
-                Temp0[1] = card.Gens[0];
-                Temp0[2] = card.Gens[1];
+                for (int i = 0; i < 8;i++)
+                {
+                    Temp0[1 + i] = card.Gens[i];
+                }
                 for (byte i = 0; i < 16; i++)
                 {
                     temp3[i] = 0x00;

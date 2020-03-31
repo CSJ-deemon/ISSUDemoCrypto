@@ -75,7 +75,7 @@
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0" Width="220">
                                 <TextBlock Text="基因:" Width="55" VerticalAlignment="Center"/>
-                                <TextBox Width="120" Name="tbox_Gene" Margin="5"/>
+                                <TextBox Width="120" Name="tbox_Gene" Margin="5" IsEnabled="False"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1" Width="220">
@@ -131,13 +131,13 @@
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="5" Grid.Column="0" Width="220">
                                 <TextBlock Text="用户余额:" Width="55" VerticalAlignment="Center"/>
-                                <TextBox Name="tbox_Banlance" Width="120" Margin="5"></TextBox>
+                                <TextBox x:Name="tbox_Banlance" Width="120" Margin="5"/>
                                 <TextBlock Text="元" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="6" Grid.Column="1" Width="220">
+                                <TextBox x:Name="tbox_ElectmentPrice" Width="120" Margin="5"/>
                                 <TextBlock Text="电价:" Width="55" VerticalAlignment="Center"/>
-                                <TextBox Name="tbox_ElectmentPrice" Width="120" Margin="5"></TextBox>
                                 <TextBlock Text="元/度" VerticalAlignment="Center"/>
                             </StackPanel>
 
@@ -149,13 +149,17 @@
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="0" Width="220">
                                 <TextBlock Text="起始时间:" Width="55" VerticalAlignment="Center"/>
-                                <TextBlock Name="tblk_StartTime" Width="120" Margin="5"></TextBlock>
+                                <TextBlock x:Name="tblk_StartTime" Width="120" Margin="5"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1" Width="220">
                                 <TextBlock Name="tblk_DevId" Text="设备编号:" Width="55" VerticalAlignment="Center"/>
                                 <TextBlock Width="120" Margin="5"></TextBlock>
                             </StackPanel>
+
+                            <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="8" Grid.Column="0" Width="220">
+                                <Button Width="100" Content="默认配置" Click="Btn_Click_DefaultCard" />
+                            </StackPanel>-->
                         </Grid>
 
                     </GroupBox>
@@ -185,7 +189,7 @@
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="2">
                                 <TextBlock Text="充值:" Width="40" VerticalAlignment="Center"/>
-                                <TextBox Width="100" Name="tbox_InputMoney"  Margin="5"/>
+                                <TextBox Width="100" x:Name="tbox_InputMoney"  Margin="5"/>
                                 <TextBlock Text="元" Width="20" VerticalAlignment="Center"/>
                                 <Button Content="确定" Name="btn_InputMoney"  Width="60" Margin="5" Click="btn_InputMoney_Click" />
                             </StackPanel>
@@ -232,8 +236,8 @@
 
                             <StackPanel Orientation="Horizontal" Grid.Row="1">
                                 <TextBlock Text="充电模式:" VerticalAlignment="Center" Width="60"/>
-                                <ComboBox Name="cbox_ChargerMode" Margin="3,5,3,5" Width="120">
-                                    <ComboBoxItem IsSelected="True">RFID</ComboBoxItem>
+                                <ComboBox x:Name="cbox_ChargerMode" Margin="3,5,3,5" Width="120">
+                                    <ComboBoxItem IsSelected="True" Content="RFID"/>
                                     <ComboBoxItem Content="即插即充"/>
                                     <ComboBoxItem Content="16A配置卡" />
                                     <ComboBoxItem Content="32A配置卡" />
