@@ -50,6 +50,37 @@ namespace ISSUDemoCrypto
         Card_Type_Project = 15
     }
 
+    public enum UserType
+    {
+        User_Type_FaceValue = 0,    //面值卡
+        User_Type_Recharge = 1,     //充值卡
+        User_Type_Internet = 2,     //联网卡
+    }
+
+    public enum AcountType
+    {
+        Acount_Type_UnAcount = 0,   //不计费
+        Acount_Type_Acount = 1,     //计费
+    }
+
+    public enum PassworldType
+    {
+        Psw_Type_UnUse = 0,     //不启用
+        Psw_Type_Use = 1,       //启用
+    }
+
+    public enum PaymentType
+    {
+        Payment_Type_UnUse = 0,     //不启用
+        Payment_Type_Use = 1,       //启用
+    }
+
+    public enum LockType
+    {
+        Lock_Type_UnLock = 0,       //解锁
+        Lock_Type_Lock =1,      //上锁
+    }
+
     public class CardInfo
     {
         public string strId;
@@ -109,6 +140,13 @@ namespace ISSUDemoCrypto
             }
         }
 
+        public static bool GetComOpen
+        {
+            get
+            {
+                return myComBase.Opened;
+            }
+        }
         public static bool GetCardInfo(ref object obj) 
         {
             string strId = "";
@@ -385,7 +423,7 @@ namespace ISSUDemoCrypto
                 {
                     Temp2[4 + i] = 0x00;
                 }
-                Temp1[14] = card.PaymentFlag;
+                //Temp1[14] = card.PaymentFlag;
 
                 for (int i = 0; i < 15; i++)
                 {

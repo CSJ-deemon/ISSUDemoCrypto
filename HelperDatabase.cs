@@ -170,7 +170,7 @@ namespace ISSUDemoCrypto
             try
             {
                 bool bResult = false;
-                string cmd = @"delete from issu_record Where MacId='" + MacId + "';";
+                string cmd = @"delete from issu_record where MacId='" + MacId + "';";
                 using (SQLiteCommand cmdCreateTb = new SQLiteCommand(cmd, sqlConn))
                 {
                     int nRet = cmdCreateTb.ExecuteNonQuery();
@@ -182,7 +182,7 @@ namespace ISSUDemoCrypto
             }
             catch (System.Exception ex)
             {
-            	
+                MessageBox.Show("删除失败\r\n" + ex.Message);
             }
             return false;
         }

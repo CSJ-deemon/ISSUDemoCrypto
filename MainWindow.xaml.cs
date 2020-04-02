@@ -23,6 +23,7 @@ namespace ISSUDemoCrypto
     {
         private bool IsCheckPowerOk = false;
         private CardInfo gCardInfo = new CardInfo();
+        private CardInfo m_BindingCardInfo = new CardInfo();
 
         public MainWindow()
         {
@@ -57,10 +58,9 @@ namespace ISSUDemoCrypto
         {
             try
             {
-                if (gCardInfo.CardType != (byte)CardType.Card_Type_Admin &&
-                    gCardInfo.CardType != (byte)CardType.Card_Type_Binding_Mother)
+                if (m_BindingCardInfo.CardType != (byte)CardType.Card_Type_Binding_Mother)
                 {
-                    MessageBox.Show("权限错误！此操作需要管理卡!");
+                    MessageBox.Show("权限错误！此操作需要秘钥验证!");
                     return;
                 }
 
@@ -75,14 +75,14 @@ namespace ISSUDemoCrypto
                     CardInfo card = new CardInfo();
                     object obj = (object)card;
                     if (M50CardHelper.GetCardInfo(ref obj) == true)
-                    {
+                    {  
                         int balance = (card.Banlance[0] << 24) + (card.Banlance[1] << 16) + 
                             (card.Banlance[2] << 8) + card.Banlance[3];
                         double dBalance = (double)balance / (double)100;
                         HelperDatabase.AddRecord("充值", card.strId, Encoding.ASCII.GetString(card.UsrId), 
                             Encoding.ASCII.GetString(card.Gens), "+" + strValue, dBalance.ToString("0.00"));
+                        UpdateCardInfoUi(card);
                     }
-
                     MessageBox.Show("充值成功!");
                 }
                 else
@@ -106,10 +106,9 @@ namespace ISSUDemoCrypto
         {
             try
             {
-                if (gCardInfo.CardType != (byte)CardType.Card_Type_Admin && 
-                    gCardInfo.CardType != (byte)CardType.Card_Type_Binding_Mother)
+                if (m_BindingCardInfo.CardType != (byte)CardType.Card_Type_Binding_Mother)
                 {
-                    MessageBox.Show("权限错误！此操作需要管理卡!");
+                    MessageBox.Show("权限错误！此操作需要秘钥验证!");
                     return;
                 }
 
@@ -129,6 +128,8 @@ namespace ISSUDemoCrypto
                         double dBalance = (double)balance / (double)100;
                         HelperDatabase.AddRecord("扣款", card.strId, Encoding.ASCII.GetString(card.UsrId),
                             Encoding.ASCII.GetString(card.Gens), "-" + strValue, dBalance.ToString("0.00"));
+
+                        UpdateCardInfoUi(card);
                     }
 
                     MessageBox.Show("扣费成功!");
@@ -153,80 +154,53 @@ namespace ISSUDemoCrypto
         {
             try
             {
+                
                 CardInfo card = new CardInfo();
-                object obj = (object)card;
-                if (M50CardHelper.GetCardInfo(ref obj) == false)
+                if(ReadCardCheck(out card) == false)
                 {
-                    MessageBox.Show("读卡失败!");
+                    UpdateCardInfoUi(card);
                     return;
                 }
 
                 //if (card.Gens[0] != 'H' && card.Gens[1] != 'D')
                 //{
-                //    MessageBox.Show("非本系统卡!");
+                //    MessageBox.Show("未识别此卡!");
                 //    return;
                 //}
-
-                //不需要管理卡；
-            //    if (gCardInfo.CardType != (byte)CardType.Card_Type_Admin)
-           //     {
-            //        MessageBox.Show("权限错误！此操作需要管理卡!");
-            //        return;
-            //    }
-
-                if (cbox_CardType.Text == "普通卡")
+                if(gCardInfo.CardType != (byte)CardType.Card_Type_Binding_Mother)
                 {
-                    card.CardType = (byte)CardType.Card_Type_Gengeral;
+                    MessageBox.Show("权限错误，没有进行秘钥验证");
+                        return ;
                 }
-                else if (cbox_CardType.Text == "工程启停卡")
-                {
-                    card.CardType = (byte)CardType.Card_Type_Project;
-                }
-                else
-                {
-                    MessageBox.Show("只能创建普通卡或工程启停卡!");
-                    return;
-                }
-
                 //====================
-                if (string.IsNullOrEmpty(tbox_Gene.Text) == true ||
-                        tbox_Gene.Text.Length != 8)
-                {
-                    throw new Exception("普通卡基因数据错误！\r\n不能为空，必须8个字节长度!");
-                }
+                //if (string.IsNullOrEmpty(tbox_Gene.Text) == true ||
+                //        tbox_Gene.Text.Length != 8)
+                //{
+                //    throw new Exception("普通卡基因数据错误！\r\n不能为空，必须8个字节长度!");
+                //}
 
                 if (string.IsNullOrEmpty(tbox_UsrId.Text) == true ||
                         tbox_UsrId.Text.Length != 8)
                 {
                     throw new Exception("用户ID数据错误！\r\n不能为空，必须8个字节长度");
                 }
-                if (string.IsNullOrEmpty(cbox_CardType.Text) ||
-                    string.IsNullOrEmpty(cbox_UsrType.Text) ||
-                    string.IsNullOrEmpty(cbox_Acount.Text) ||
-                    string.IsNullOrEmpty(cbox_Psw.Text) ||
-                    string.IsNullOrEmpty(cbox_Lock.Text) ||
+                if (
                     string.IsNullOrEmpty(tbox_UsrId.Text) ||
-                    string.IsNullOrEmpty(cbox_Payment.Text) ||
                     string.IsNullOrEmpty(tbox_Banlance.Text) ||
-                    string.IsNullOrEmpty(tbox_UsrPwd.Text) ||
                     string.IsNullOrEmpty(tbox_StopCarPrice.Text) ||
                     string.IsNullOrEmpty(tbox_ElectmentPrice.Text))
                 {
                     throw new Exception("参数错误，请检查参数!");
                 }
-                byte[] gene = Encoding.ASCII.GetBytes(tbox_Gene.Text);
-
-                for (byte i = 0; i < 8; i++)
-                    card.Gens[i] = gene[i];     //gCardInfo.Gens[i];
-               // card.Gens[6] = gene[0];
-               // card.Gens[7] = gene[1];
-                card.CardType = (byte)cbox_CardType.SelectedIndex;
-                card.UsrType = (byte)cbox_UsrType.SelectedIndex;
-                card.Acount = (byte)cbox_Acount.SelectedIndex;
-                card.IsPwd = (byte)cbox_Psw.SelectedIndex;
-                card.IsLock = (byte)cbox_Lock.SelectedIndex;
+                byte[] gene = m_BindingCardInfo.Gens;
+                card.Gens = gene;
+                card.CardType = (byte)CardType.Card_Type_Gengeral;
+                card.UsrType = (byte)UserType.User_Type_FaceValue; //0,面值卡 1 充值卡 2联网卡
+                card.Acount = (byte)AcountType.Acount_Type_Acount;
+                card.IsPwd = (byte)PassworldType.Psw_Type_UnUse;
+                card.IsLock = (byte)LockType.Lock_Type_UnLock;
                 card.UsrId = Encoding.ASCII.GetBytes(tbox_UsrId.Text.Trim());
-                card.PaymentFlag = (byte)cbox_Payment.SelectedIndex;
+                card.PaymentFlag = (byte)PaymentType.Payment_Type_Use;
 
                 string strValue = tbox_Banlance.Text.Trim();
                 double Value = Convert.ToDouble(strValue);
@@ -237,7 +211,7 @@ namespace ISSUDemoCrypto
                 card.Banlance[2] = (byte)(nValue >> 8);
                 card.Banlance[3] = (byte)nValue;
 
-                UInt32 nPwd = Convert.ToUInt32(tbox_UsrPwd.Text.Trim());
+                UInt32 nPwd = Convert.ToUInt32(0);
                 card.UsrPwd[0] = (byte)(nPwd >> 24);
                 card.UsrPwd[1] = (byte)(nPwd >> 16);
                 card.UsrPwd[2] = (byte)(nPwd >> 8);
@@ -261,14 +235,16 @@ namespace ISSUDemoCrypto
                 //====================
                 if (M50CardHelper.NewCard(card) == true)
                 {
-                    MessageBox.Show("创建普通卡或工程启停卡成功!");
+                    MessageBox.Show("用户卡制作成功!");
 
                     HelperDatabase.AddRecord("新建", card.strId, tbox_UsrId.Text.Trim(),
                             Encoding.ASCII.GetString(card.Gens), "0", tbox_Banlance.Text.Trim());
+
+                    UpdateCardInfoUi(card);
                 }
                 else
                 {
-                    MessageBox.Show("创建普通卡或工程启停卡失败1");
+                    MessageBox.Show("用户卡制作失败");
                 }
             }
             catch (System.Exception ex)
@@ -324,82 +300,47 @@ namespace ISSUDemoCrypto
             }
         }
 
+        private bool ReadCardCheck(out CardInfo outCard, bool addPsw = true)
+        {
+            outCard = new CardInfo();
+            object obj = (object)outCard;
+            if (M50CardHelper.GetCardInfo(ref obj) == false)
+            {
+                if (M50CardHelper.GetComOpen == false)
+                {
+                    MessageBox.Show("没有打开串口");
+                    return false;
+                }
+
+                if (addPsw)
+                {
+                    if (AddPsw() == false)
+                    {
+                        MessageBox.Show("未识别此卡");
+                        return false;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("未识别此卡");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// 读卡
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void tblk_ReadCard_MouseDown(object sender, MouseButtonEventArgs e)
+        private void btn_ReadCard_Click(object sender, RoutedEventArgs e)
         {
             CardInfo card = new CardInfo();
-            object obj = (object)card;
-            if (M50CardHelper.GetCardInfo(ref obj) == false)
-            {
-                MessageBox.Show("读卡失败");
-                return;
-            }
+            ReadCardCheck(out card, false);
 
-
-            tblk_CardId.Text = card.strId;
-
-            //if (card.Gens[0] != 'H' || card.Gens[1] != 'D')
-            //{
-            //    MessageBox.Show("非本系统卡，读卡失败!", "提示");
-            //    return;
-            //}
-
-            tbox_Gene.Text = Encoding.ASCII.GetString(card.Gens, 0, 8);
-            if (card.CardType == (byte)CardType.Card_Type_Empty)
-                cbox_CardType.Text = "空白卡";
-            else if (card.CardType == (byte)CardType.Card_Type_Mother)
-                cbox_CardType.Text = "母卡";
-            else if (card.CardType == (byte)CardType.Card_Type_Super_Admin)
-                cbox_CardType.Text = "超级管理员卡";
-            else if (card.CardType == (byte)CardType.Card_Type_Admin)
-                cbox_CardType.Text = "管理员卡";
-            else if (card.CardType == (byte)CardType.Card_Type_Gengeral)
-                cbox_CardType.Text = "普通卡";
-            else if (card.CardType == (byte)CardType.Card_Type_Project)
-                cbox_CardType.Text = "工程启停卡";
-            //cbox_CardType.SelectedIndex = card.CardType;
-            cbox_UsrType.SelectedIndex = card.UsrType;
-            cbox_Acount.SelectedIndex = card.Acount;
-            cbox_Psw.SelectedIndex = card.IsPwd;
-            cbox_Lock.SelectedIndex = card.IsLock;
-            tbox_UsrId.Text = Encoding.ASCII.GetString(card.UsrId);
-            cbox_Payment.SelectedIndex = card.PaymentFlag;
-
-            UInt32 nValue = 0;
-            nValue = card.Banlance[0];
-            nValue <<= 8;
-            nValue += card.Banlance[1];
-            nValue <<= 8;
-            nValue += card.Banlance[2];
-            nValue <<= 8;
-            nValue += card.Banlance[3];
-            double dValue = (double)nValue / (double)100;
-            tbox_Banlance.Text = dValue.ToString("0.00");
-
-            nValue = card.UsrPwd[0];
-            nValue <<= 8;
-            nValue += card.UsrPwd[1];
-            nValue <<= 8;
-            nValue += card.UsrPwd[2];
-            nValue <<= 8;
-            nValue += card.UsrPwd[3];
-            tbox_UsrPwd.Text = nValue.ToString();
-
-            nValue = card.StopCarPrice[0];
-            nValue <<= 8;
-            nValue += card.StopCarPrice[1];
-            dValue = (double)nValue / (double)100;
-            tbox_StopCarPrice.Text = dValue.ToString("0.00");
-
-            nValue = card.ElePrice[0];
-            nValue <<= 8;
-            nValue += card.ElePrice[1];
-            dValue = (double)nValue / (double)100;
-            tbox_ElectmentPrice.Text = dValue.ToString("0.00");
+            UpdateCardInfoUi(card);
         }
         #endregion
 
@@ -412,7 +353,7 @@ namespace ISSUDemoCrypto
             }
             else
             {
-                tbox_TipCard.Content = "鉴权失败!";
+                tbox_TipCard.Content = "验证失败!";
             }
         }
 
@@ -537,10 +478,10 @@ namespace ISSUDemoCrypto
             //object obj = (object)card;
             //if (M50CardHelper.GetCardInfo(ref obj) == false)
             //{
-            //    tblk_ManagerTip.Text = "读卡失败！ 非本系统卡";
+            //    tblk_ManagerTip.Text = "读卡失败！ 未识别此卡";
             //    rdbtn_CardPwd.IsChecked = true;
             //    tbox_Gene.Text = "";
-            //    cbox_CardType.SelectedIndex = -1;
+            //    tbox_CardType.SelectedIndex = -1;
             //    return;
             //}
 
@@ -563,7 +504,7 @@ namespace ISSUDemoCrypto
                 //byte[] genes = Encoding.ASCII.GetBytes(tbox_ManagerGene.Text.Trim());
 
                 if (IsCheckPowerOk == false)
-                    throw new Exception("鉴权失败，请刷卡重新鉴权!");
+                    throw new Exception("验证失败，请刷卡重新验证!");
 
                 CardInfo cardinfo = new CardInfo();
                 object obj = (object)cardinfo;
@@ -575,7 +516,7 @@ namespace ISSUDemoCrypto
 
                 CardInfo ci = (CardInfo)obj;
                 if (ci.Gens[0] != 'H' || ci.Gens[1] != 'D')
-                    throw new Exception("非本系统卡!");
+                    throw new Exception("未识别此卡!");
 
                 CardInfo newCard = new CardInfo();
                 newCard.CardType = type;
@@ -644,7 +585,7 @@ namespace ISSUDemoCrypto
             tblk_CardId.Text = card.strId;
             if (card.Gens[0] != 'H' || card.Gens[1] != 'D')
             {
-                MessageBox.Show("非本系统卡，读卡失败!", "提示");
+                MessageBox.Show("未识别此卡，读卡失败!", "提示");
                 return;
             }
 
@@ -701,7 +642,7 @@ namespace ISSUDemoCrypto
                     btn_OpenCom.Foreground = Brushes.Black;
                     btn_OpenCom.Content = "打开串口";
                 }
-
+                ChangeTipsCard();
             }
             catch (System.Exception ex)
             {
@@ -758,9 +699,9 @@ namespace ISSUDemoCrypto
             else return (type.ToString("X2") + " 未知");
         }
         /*
-         * 鉴权
+         * 验证
          * 老版:通过建立母卡->超级管理员->管理员->普通卡
-         * 新版:通过秘钥卡进行鉴权->普通卡 
+         * 新版:通过绑定卡进行验证->普通卡 
          */
         public void CheckPowerRefreshUi(CardInfo card)
         {
@@ -784,8 +725,9 @@ namespace ISSUDemoCrypto
             }
             else if (card.CardType == (byte)CardType.Card_Type_Binding_Mother)
             {
-                strResult = "成功, [绑定母卡]";
+                strResult = "验证成功";
                 IsCheckPowerOk = true;
+                m_BindingCardInfo = card;
             }
             else if (card.CardType == (byte)CardType.Card_Type_Binding_Super)
             {
@@ -799,8 +741,9 @@ namespace ISSUDemoCrypto
             }
             else
             {
-                gCardInfo = null;
-                strResult = "鉴权失败!";
+                gCardInfo = new CardInfo();
+                m_BindingCardInfo = new CardInfo();
+                strResult = "验证失败!";
             }
             tbox_TipCard.Content = strResult;
         }
@@ -817,34 +760,23 @@ namespace ISSUDemoCrypto
         {
             try
             {
+               
                 CardInfo card = new CardInfo();
-                object obj = (object)card;
-                if (M50CardHelper.GetCardInfo(ref obj) == false)
+                if(ReadCardCheck(out card) == false)
                 {
-                    MessageBox.Show("读卡失败！非本系统卡.");
+                    return;
+                }
+
+                if (m_BindingCardInfo.CardType != (byte)CardType.Card_Type_Binding_Mother)
+                {
+                    MessageBox.Show("请进行秘钥验证");
                     return;
                 }
 
                 tblk_CardId.Text = card.strId;
-                //if (card.Gens[0] != 'H' || card.Gens[1] != 'D')
-                //{
-                //    MessageBox.Show("非本系统卡，读卡失败!", "提示");
-                //    return;
-                //}
 
                 CardInfo newCard = new CardInfo();
-                //newCard.Gens[0] = card.Gens[0];
-                //newCard.Gens[1] = card.Gens[1];
-                
-                //if(string.IsNullOrEmpty(tbox_ManagerGene.Text))
-                //{ 
-                //    card.Gens.CopyTo(newCard.Gens, 0);
-                //}
-                //else
-                //{
-                //    newCard.Gens = Encoding.ASCII.GetBytes(tbox_ManagerGene.Text.Trim());
-                //}
-
+                newCard.Gens = m_BindingCardInfo.Gens;
                 newCard.CardType = (byte)CardType.Card_Type_Setting;
                 newCard.Acount = Convert.ToByte(cbox_ChargerChannel.SelectedIndex);
                 newCard.UsrType = Convert.ToByte(cbox_ChargerMode.SelectedIndex);
@@ -928,17 +860,14 @@ namespace ISSUDemoCrypto
             try
             {
                 CardInfo card = new CardInfo();
-                object obj = (object)card;
-                if (M50CardHelper.GetCardInfo(ref obj) == false)
+                if (ReadCardCheck(out card) == false)
                 {
-                    MessageBox.Show("读卡失败！非本系统卡.");
                     return;
                 }
-
                 tblk_CardId.Text = card.strId;
                 //if (card.Gens[0] != 'H' || card.Gens[1] != 'D')
                 //{
-                //    MessageBox.Show("非本系统卡，读卡失败!", "提示");
+                //    MessageBox.Show("未识别此卡，读卡失败!", "提示");
                 //    return;
                 //}
 
@@ -985,18 +914,17 @@ namespace ISSUDemoCrypto
         {
             try
             {
+               
                 CardInfo card = new CardInfo();
-                object obj = (object)card;
-                if (M50CardHelper.GetCardInfo(ref obj) == false)
+                if (ReadCardCheck(out card) == false)
                 {
-                    MessageBox.Show("读卡失败！非本系统卡.");
                     return;
                 }
 
                 tblk_CardId.Text = card.strId;
                 //if (card.Gens[0] != 'H' || card.Gens[1] != 'D')
                 //{
-                //    MessageBox.Show("非本系统卡，读卡失败!", "提示");
+                //    MessageBox.Show("未识别此卡，读卡失败!", "提示");
                 //    return;
                 //}
 
@@ -1034,18 +962,17 @@ namespace ISSUDemoCrypto
         {
             try
             {
+               
                 CardInfo card = new CardInfo();
-                object obj = (object)card;
-                if (M50CardHelper.GetCardInfo(ref obj) == false)
+                if (ReadCardCheck(out card) == false)
                 {
-                    MessageBox.Show("读卡失败！非本系统卡.");
                     return;
                 }
 
                 tblk_CardId.Text = card.strId;
                 //if (card.Gens[0] != 'H' || card.Gens[1] != 'D')
                 //{
-                //    MessageBox.Show("非本系统卡，读卡失败!", "提示");
+                //    MessageBox.Show("未识别此卡，读卡失败!", "提示");
                 //    return;
                 //}
 
@@ -1076,18 +1003,17 @@ namespace ISSUDemoCrypto
         {
             try
             {
+               
                 CardInfo card = new CardInfo();
-                object obj = (object)card;
-                if (M50CardHelper.GetCardInfo(ref obj) == false)
+                if (ReadCardCheck(out card) == false)
                 {
-                    MessageBox.Show("读卡失败！非本系统卡.");
                     return;
                 }
 
                 tblk_CardId.Text = card.strId;
                 //if (card.Gens[0] != 'H' || card.Gens[1] != 'D')
                 //{
-                //    MessageBox.Show("非本系统卡，读卡失败!", "提示");
+                //    MessageBox.Show("未识别此卡，读卡失败!", "提示");
                 //    return;
                 //}
 
@@ -1167,29 +1093,30 @@ namespace ISSUDemoCrypto
             }
 
             MessageBox.Show("修改密码失败!");
-
         }
+
+       
 
         private void btn_SettingType0_Click(object sender, RoutedEventArgs e)
         {
+            
             CardInfo card = new CardInfo();
-            object obj = (object)card;
-            if (M50CardHelper.GetCardInfo(ref obj) == false)
+            if (ReadCardCheck(out card) == false)
             {
-                MessageBox.Show("读卡失败！非本系统卡.");
+                return;
+            }
+
+            if(m_BindingCardInfo.CardType != (byte)CardType.Card_Type_Binding_Mother)
+            {
+                MessageBox.Show("请进行秘钥验证");
                 return;
             }
 
             tblk_CardId.Text = card.strId;
-            //if (card.Gens[0] != 'H' || card.Gens[1] != 'D')
-            //{
-            //    MessageBox.Show("非本系统卡，读卡失败!", "提示");
-            //    return;
-            //}
 
+            
             CardInfo newCard = new CardInfo();
-            newCard.Gens[0] = (byte)'H';
-            newCard.Gens[1] = (byte)'D';
+            newCard.Gens = m_BindingCardInfo.Gens;
             string strText = cbox_CardType0.Text;
             if (strText == "启停卡")
             {
@@ -1207,7 +1134,7 @@ namespace ISSUDemoCrypto
             //{
             //    newCard.CardType = (byte)CardType.Card_Type_StartStop + 4;
             //}
-            //else if (strText == "即插即充配置卡")
+            //else if (strText == "即插即充配置卡");
             //{
             //    newCard.CardType = (byte)CardType.Card_Type_StartStop + 5;
             //}
@@ -1251,12 +1178,13 @@ namespace ISSUDemoCrypto
 
             MessageBox.Show("清除密码失败!");
         }
-
+        
         private void cbox_EmMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
                 ComboBoxItem cbi = (ComboBoxItem)cbox_EmMode.SelectedItem;
+                int text = cbox_EmMode.SelectedIndex;
                 string strText = (string)cbi.Content;
                 if (strText == "加密版")
                 {
@@ -1290,10 +1218,16 @@ namespace ISSUDemoCrypto
         {
             try
             {
+                CardInfo card = new CardInfo();
+                if (ReadCardCheck(out card) == false)
+                {
+                    return;
+                }
+
                 string strBandingGene = tbox_BandingGene.Text.Trim();
                 if (strBandingGene.Length != 8)
                 {
-                    MessageBox.Show("绑定基因长度必须等于8.");
+                    MessageBox.Show("密码长度必须等于8.");
                     return;
                 }
 
@@ -1304,13 +1238,14 @@ namespace ISSUDemoCrypto
                 if (M50CardHelper.NewCard(newCard) == true)
                 {
                     MessageBox.Show("建卡成功!");
+                    tbox_BandingGene.Text = "";
                     return;
                 }
                 MessageBox.Show("建卡失败!");
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show(ex.Message, "提示");
+                
             }
         }
 
@@ -1319,7 +1254,7 @@ namespace ISSUDemoCrypto
         {
             try
             {
-                string strKeyGene = tbox_KeyGene.Text.Trim();
+                string strKeyGene = "";//tbox_KeyGene.Text.Trim();
                 if (strKeyGene.Length != 8)
                 {
                     MessageBox.Show("用户基因长度必须等于8.");
@@ -1342,5 +1277,156 @@ namespace ISSUDemoCrypto
                 MessageBox.Show(ex.Message, "提示");
             }
         }
+
+        private void tbox_UserId_SelectChanged(object sender, RoutedEventArgs e)
+        {
+
+            TextBoxChangeCheck(e, tbox_UserIdTip, 8);
+        }
+
+        public void TextBoxChangeCheck(RoutedEventArgs e ,TextBlock tip, int length)
+        {
+            TextBox tbx = (TextBox)e.Source;
+
+            if (tbx.Text.Length != 8 && tbx.Text.Length != 0)
+            {
+                tip.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                tip.Visibility = System.Windows.Visibility.Hidden;
+            }
+        }
+
+        private void ChangeTipsCard()
+        {
+            string tip = "";
+            if (!btn_CheckPower.IsEnabled)
+            {
+                tip = "请打开串口";
+            }
+            else if (!IsCheckPowerOk && btn_CheckPower.IsEnabled)
+            {
+                tip = "如需制卡，请进行秘钥验证";
+            }   
+
+            tbox_TipCard.Content = tip;
+        }
+
+        public bool AddPsw()
+        {
+            bool bRet = M50CardHelper.SetPassword(7);
+            if (bRet)
+            {
+                bRet = M50CardHelper.SetPassword(7 + 4);
+                bRet = M50CardHelper.SetPassword(7 + 8);
+                if (bRet)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        public bool CleanPsw()
+        {
+            bool bRet = M50CardHelper.CleanPassword(7);
+            if (bRet)
+            {
+                bRet = M50CardHelper.CleanPassword(7 + 4);
+                bRet = M50CardHelper.CleanPassword(7 + 8);
+                if (bRet)
+                {
+                    MessageBox.Show("清除密码成功!");
+                    return true;
+                }
+            }
+
+            MessageBox.Show("清除密码失败!");
+            return false;
+        }
+
+        private void btn_BandingGene_SelectChanged(object sender, RoutedEventArgs e)
+        {
+            TextBoxChangeCheck(e, tblk_BandingGenTips, 8);
+        }
+
+        private void Btn_Clean(object sender, RoutedEventArgs e)
+        {
+            CleanPsw();
+        }
+
+        private void UpdateCardInfoUi(CardInfo card)
+        {
+            if(string.IsNullOrEmpty(card.strId) == true)
+            {
+                tblk_CardId.Text = "";
+                tbox_Gene.Text = "";
+                tbox_UsrId.Text = "";
+                tbox_Banlance.Text = "";
+                tbox_StopCarPrice.Text = "";
+                tbox_ElectmentPrice.Text = "";
+                return;
+            }
+            tblk_CardId.Text = card.strId;
+
+            //if (card.Gens[0] != 'H' || card.Gens[1] != 'D')
+            //{
+            //    MessageBox.Show("未识别此卡，读卡失败!", "提示");
+            //    return;
+            //}
+
+            tbox_Gene.Text = "";
+            //if(card.CardType == (byte)CardType.Card_Type_Binding_Mother)
+            //{
+            tbox_Gene.Text = Encoding.ASCII.GetString(card.Gens, 0, 8);
+            // }
+            tbox_CardType.Text = "";
+            if (card.CardType == (byte)CardType.Card_Type_Empty)
+                tbox_CardType.Text = "空白卡";
+            else if (card.CardType == (byte)CardType.Card_Type_Mother)
+                tbox_CardType.Text = "母卡";
+            else if (card.CardType == (byte)CardType.Card_Type_Super_Admin)
+                tbox_CardType.Text = "超级管理员卡";
+            else if (card.CardType == (byte)CardType.Card_Type_Admin)
+                tbox_CardType.Text = "管理员卡";
+            else if (card.CardType == (byte)CardType.Card_Type_Gengeral)
+                tbox_CardType.Text = "普通卡";
+            else if (card.CardType == (byte)CardType.Card_Type_Project)
+                tbox_CardType.Text = "工程启停卡";
+            else if (card.CardType == (byte)CardType.Card_Type_Binding_Mother)
+                tbox_CardType.Text = "秘钥管理卡";
+            else if (card.CardType == (byte)CardType.Card_Type_Setting)
+                tbox_CardType.Text = "配置卡";
+
+            //tbox_CardType.SelectedIndex = card.CardType;
+
+            tbox_UsrId.Text = Encoding.ASCII.GetString(card.UsrId);
+
+            UInt32 nValue = 0;
+            nValue = card.Banlance[0];
+            nValue <<= 8;
+            nValue += card.Banlance[1];
+            nValue <<= 8;
+            nValue += card.Banlance[2];
+            nValue <<= 8;
+            nValue += card.Banlance[3];
+            double dValue = (double)nValue / (double)100;
+            tbox_Banlance.Text = dValue.ToString("0.00");
+
+            nValue = card.StopCarPrice[0];
+            nValue <<= 8;
+            nValue += card.StopCarPrice[1];
+            dValue = (double)nValue / (double)100;
+            tbox_StopCarPrice.Text = dValue.ToString("0.00");
+
+            nValue = card.ElePrice[0];
+            nValue <<= 8;
+            nValue += card.ElePrice[1];
+            dValue = (double)nValue / (double)100;
+            tbox_ElectmentPrice.Text = dValue.ToString("0.00");
+        }
+
     }
 }

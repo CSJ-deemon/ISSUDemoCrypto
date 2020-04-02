@@ -160,6 +160,7 @@ namespace ISSUDemoCrypto
 
         private void btn_Delete_Click(object sender, RoutedEventArgs e)
         {
+            if (dgrd_View.SelectedItem == null) return;
             dsHandleRecord record = (dsHandleRecord)dgrd_View.SelectedItem;
             if (HelperDatabase.DeleteRecord(record.MacId))
             {
