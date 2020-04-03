@@ -9,7 +9,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ISSUDemoCrypto</RootNamespace>
-    <AssemblyName>发卡管理系统V1.7-20200401</AssemblyName>
+    <AssemblyName>发卡管理系统V2.0-20200403</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
