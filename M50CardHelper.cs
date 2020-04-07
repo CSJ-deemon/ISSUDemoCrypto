@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO.Ports;
 using System.Threading;
+using System.ComponentModel;
 
 namespace ISSUDemoCrypto
 {
@@ -32,21 +33,37 @@ namespace ISSUDemoCrypto
 
     public enum CardType
     {
+        [Description("空白卡")]
         Card_Type_Empty = 0,
+        [Description("母卡")]
         Card_Type_Mother = 1,
+        [Description("超级管理员卡")]
         Card_Type_Super_Admin = 2,
+        [Description("管理员卡")]
         Card_Type_Admin = 3,
+        [Description("用户卡")]
         Card_Type_Gengeral = 4,
+        [Description("配置卡")]
         Card_Type_Setting = 5,
+        [Description("IP配置卡")]
         Card_Type_Setting_Ip = 6,
+        [Description("地址配置卡")]
         Card_Type_Setting_Addr = 7,
+        [Description("通信方式配置卡")]
         Card_Type_Setting_CommType = 8,
-        Card_Type_Setting_Price = 9, 
+        [Description("电价配置卡")]
+        Card_Type_Setting_Price = 9,
+        [Description("管理秘钥卡")]
         Card_Type_Binding_Mother = 10,
+        [Description("绑定超级管理员卡")]
         Card_Type_Binding_Super = 11,
+        [Description("绑定管理员卡")]
         Card_Type_Binding_Admin = 12,
+        [Description("绑定用户卡")]
         Card_Type_Binding_Usr = 13,
+        [Description("启停卡")]
         Card_Type_StartStop = 14,
+        [Description("工程维护卡")]
         Card_Type_Project = 15
     }
 
@@ -79,6 +96,18 @@ namespace ISSUDemoCrypto
     {
         Lock_Type_UnLock = 0,       //解锁
         Lock_Type_Lock =1,      //上锁
+    }
+    public static class EnumAttribute
+    {
+        public static string GetDescription(this Enum value)
+        {
+            System.Reflection.FieldInfo fi = value.GetType().GetField(value.ToString());
+
+            DescriptionAttribute[] attr = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
+            if (attr.Length > 0)
+                return attr[0].Description;
+            return value.ToString();
+        }
     }
 
     public class CardInfo
@@ -118,6 +147,8 @@ namespace ISSUDemoCrypto
             {
                 if (myComBase.Opened == false)
                 {
+                    CardType.Card_Type_Admin.GetDescription();
+                    byte it = (byte)CardType.Card_Type_Admin;
                     myComBase.PortNum = Name;
                     myComBase.BaudRate = Convert.ToInt32(Bautrate);
                     myComBase.ReadTimeout = 3 * 1000;
@@ -633,25 +664,35 @@ namespace ISSUDemoCrypto
         /// <returns></returns>
         public static bool ReadCardNum(out string CardId)
         {
-            CardId = "";
-            byte[] InBuffer = new byte[32];
-            byte[] OutBuffer = new byte[32];
-            byte[] Num = new byte[4];
-            InBuffer[0] = (byte)CMD_TABLE.GETVERSION;
-            if (Ioctl((byte)CMD_TABLE.GETCARDNUM, InBuffer, 1, out OutBuffer) == false) return false;
-            if (OutBuffer[0] == 0x00)
+            try
             {
-                Num[0] = OutBuffer[7];
-                Num[1] = OutBuffer[8];
-                Num[2] = OutBuffer[9];
-                Num[3] = OutBuffer[10];
-                for (int i = 0; i < Num.Length; i++)
+
+
+                CardId = "";
+                byte[] InBuffer = new byte[32];
+                byte[] OutBuffer = new byte[32];
+                byte[] Num = new byte[4];
+                InBuffer[0] = (byte)CMD_TABLE.GETVERSION;
+                if (Ioctl((byte)CMD_TABLE.GETCARDNUM, InBuffer, 1, out OutBuffer) == false) return false;
+                if (OutBuffer[0] == 0x00)
                 {
-                    CardId += Num[i].ToString("x2");
+                    Num[0] = OutBuffer[7];
+                    Num[1] = OutBuffer[8];
+                    Num[2] = OutBuffer[9];
+                    Num[3] = OutBuffer[10];
+                    for (int i = 0; i < Num.Length; i++)
+                    {
+                        CardId += Num[i].ToString("x2");
+                    }
+                    return true;
                 }
-                return true;
+                return false;
             }
-            return false;
+            catch
+            {
+                CardId = "";
+                return false;
+            }
         }
 
         /// <summary>

@@ -13,9 +13,12 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO.Ports;
 using System.IO;
+using System.ComponentModel;
 
 namespace ISSUDemoCrypto
 {
+
+    
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
@@ -60,7 +63,7 @@ namespace ISSUDemoCrypto
             {
                 if (m_BindingCardInfo.CardType != (byte)CardType.Card_Type_Binding_Mother)
                 {
-                    MessageBox.Show("请进行秘钥验证!");
+                    MessageBox.Show(CardErrorTips.CheckPowerOff);
                     return;
                 }
 
@@ -83,11 +86,11 @@ namespace ISSUDemoCrypto
                             Encoding.ASCII.GetString(card.Gens), "+" + strValue, dBalance.ToString("0.00"));
                         UpdateCardInfoUi(card);
                     }
-                    MessageBox.Show("充值成功!");
+                    MessageBox.Show(CardErrorTips.InputMoneySucc);
                 }
                 else
                 {
-                    MessageBox.Show("充值失败!");
+                    MessageBox.Show(CardErrorTips.InputMoneyFail);
                 }
 
             }
@@ -108,7 +111,7 @@ namespace ISSUDemoCrypto
             {
                 if (m_BindingCardInfo.CardType != (byte)CardType.Card_Type_Binding_Mother)
                 {
-                    MessageBox.Show("请进行秘钥验证!");
+                    MessageBox.Show(CardErrorTips.CheckPowerOff);
                     return;
                 }
 
@@ -132,11 +135,11 @@ namespace ISSUDemoCrypto
                         UpdateCardInfoUi(card);
                     }
 
-                    MessageBox.Show("退款成功!");
+                    MessageBox.Show(CardErrorTips.OutputMoneySucc);
                 }
                 else
                 {
-                    MessageBox.Show("退款失败!");
+                    MessageBox.Show(CardErrorTips.OutputMoneyFail);
                 }
             }
             catch (System.Exception ex)
@@ -164,14 +167,14 @@ namespace ISSUDemoCrypto
 
                 if(gCardInfo.CardType != (byte)CardType.Card_Type_Binding_Mother)
                 {
-                    MessageBox.Show("请进行秘钥验证");
+                    MessageBox.Show(CardErrorTips.CheckPowerOff);
                         return ;
                 }
 
                 if (string.IsNullOrEmpty(tbox_UsrId.Text) == true ||
                         tbox_UsrId.Text.Length != 8)
                 {
-                    throw new Exception("用户编号不规范，请重新输入");
+                    throw new Exception(CardErrorTips.PassWordLengthError);
                 }
                 if (
                     string.IsNullOrEmpty(tbox_UsrId.Text) ||
@@ -179,7 +182,7 @@ namespace ISSUDemoCrypto
                     string.IsNullOrEmpty(tbox_StopCarPrice.Text) ||
                     string.IsNullOrEmpty(tbox_ElectmentPrice.Text))
                 {
-                    throw new Exception("存在参数没有填写，请填写参数!");
+                    throw new Exception(CardErrorTips.TextNull);
                 }
                 byte[] gene = m_BindingCardInfo.Gens;
                 card.Gens = gene;
@@ -224,7 +227,7 @@ namespace ISSUDemoCrypto
                 //====================
                 if (M50CardHelper.NewCard(card) == true)
                 {
-                    MessageBox.Show("用户卡制作成功!");
+                    MakeCardErrorTip(true, card);
 
                     HelperDatabase.AddRecord("新建", card.strId, tbox_UsrId.Text.Trim(),
                             Encoding.ASCII.GetString(card.Gens), "0", tbox_Banlance.Text.Trim());
@@ -233,14 +236,13 @@ namespace ISSUDemoCrypto
                 }
                 else
                 {
-                    MessageBox.Show("用户卡制作失败");
+                    MakeCardErrorTip(false, card);
                 }
             }
             catch (System.Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
-
         }
 
         /// <summary>
@@ -254,7 +256,7 @@ namespace ISSUDemoCrypto
             object obj = (object)card;
             if (M50CardHelper.GetCardInfo(ref obj) == false)
             {
-                MessageBox.Show("读卡失败!");
+                MessageBox.Show(CardErrorTips.ReadFail);
                 return;
             }
 
@@ -297,11 +299,11 @@ namespace ISSUDemoCrypto
             {
                 if (M50CardHelper.GetComOpen == false)
                 {
-                    MessageBox.Show("没有打开串口");
+                    MessageBox.Show(CardErrorTips.OpenComFail);
                     return false;
                 }
 
-                MessageBox.Show("未识别此卡");
+                MessageBox.Show(CardErrorTips.ReadFail);
                 return false;
             }
             return true;
@@ -334,8 +336,8 @@ namespace ISSUDemoCrypto
             }
             else
             {
-                tbox_TipCard.Content = "验证失败!";
-                MessageBox.Show("验证失败");
+                tbox_TipCard.Content = CardErrorTips.CheckPowerFail;
+                MessageBox.Show(CardErrorTips.CheckPowerFail);
             }
         }
 
@@ -486,19 +488,19 @@ namespace ISSUDemoCrypto
                 //byte[] genes = Encoding.ASCII.GetBytes(tbox_ManagerGene.Text.Trim());
 
                 if (IsCheckPowerOk == false)
-                    throw new Exception("验证失败，请刷卡重新验证!");
+                    throw new Exception(CardErrorTips.CheckPowerFail);
 
                 CardInfo cardinfo = new CardInfo();
                 object obj = (object)cardinfo;
                 if (M50CardHelper.GetCardInfo(ref obj) == false)
-                    throw new Exception("读卡失败!");
+                    throw new Exception(CardErrorTips.ReadFail);
 
                 byte type = GetUsrCreateCardType();
                 if (type == 0xff) return;
 
                 CardInfo ci = (CardInfo)obj;
                 if (ci.Gens[0] != 'H' || ci.Gens[1] != 'D')
-                    throw new Exception("未识别此卡!");
+                    throw new Exception(CardErrorTips.ReadFail);
 
                 CardInfo newCard = new CardInfo();
                 newCard.CardType = type;
@@ -525,8 +527,8 @@ namespace ISSUDemoCrypto
                 //}
 
                 if (M50CardHelper.NewCard(newCard) == true)
-                    throw new Exception("建卡成功!");
-                else throw new Exception("建卡失败!");
+                    throw new Exception(string.Format(CardErrorTips.Mat_MakeSucc,((CardType)cardinfo.CardType).GetDescription()));
+                else throw new Exception(string.Format(CardErrorTips.Mat_MakeFail, ((CardType)cardinfo.CardType).GetDescription()));
 
             }
             catch (System.Exception ex)
@@ -567,7 +569,7 @@ namespace ISSUDemoCrypto
             tblk_CardId.Text = card.strId;
             if (card.Gens[0] != 'H' || card.Gens[1] != 'D')
             {
-                MessageBox.Show("未识别此卡，读卡失败!", "提示");
+                MessageBox.Show(CardErrorTips.ReadFail);
                 return;
             }
 
@@ -616,6 +618,7 @@ namespace ISSUDemoCrypto
                     else
                     {
                         MessageBox.Show("打开失败!");
+                        return;
                     }
                 }
                 else
@@ -725,7 +728,7 @@ namespace ISSUDemoCrypto
             {
                 gCardInfo = new CardInfo();
                 m_BindingCardInfo = new CardInfo();
-                strResult = "验证失败!";
+                strResult = CardErrorTips.CheckPowerFail;
             }
             tbox_TipCard.Content = strResult;
         }
@@ -751,7 +754,7 @@ namespace ISSUDemoCrypto
 
                 if (m_BindingCardInfo.CardType != (byte)CardType.Card_Type_Binding_Mother)
                 {
-                    MessageBox.Show("请进行秘钥验证");
+                    MessageBox.Show(CardErrorTips.CheckPowerOff);
                     return;
                 }
 
@@ -764,11 +767,11 @@ namespace ISSUDemoCrypto
                 newCard.UsrType = Convert.ToByte(cbox_ChargerMode.SelectedIndex);
                 if (M50CardHelper.NewCard(newCard) == true)
                 {
-                    MessageBox.Show("设置成功!");
+                    MessageBox.Show(string.Format(CardErrorTips.Mat_MakeSucc,((CardType)card.CardType).GetDescription()));
                 }
                 else
                 {
-                    MessageBox.Show("设置失败!");
+                    MessageBox.Show(string.Format(CardErrorTips.Mat_MakeFail, ((CardType)card.CardType).GetDescription()));
                 }
             }
             catch (System.Exception ex)
@@ -785,11 +788,11 @@ namespace ISSUDemoCrypto
             newCard.CardType = (byte)CardType.Card_Type_Mother;
             if (M50CardHelper.NewCard(newCard) == true)
             {
-                MessageBox.Show("建卡成功!");
+                MessageBox.Show(string.Format(CardErrorTips.Mat_MakeSucc, ((CardType)newCard.CardType).GetDescription()));
             }
             else
             {
-                MessageBox.Show("建卡失败!");
+                MessageBox.Show(string.Format(CardErrorTips.Mat_MakeFail, ((CardType)newCard.CardType).GetDescription()));
             }
         }
 
@@ -801,11 +804,11 @@ namespace ISSUDemoCrypto
             newCard.CardType = (byte)CardType.Card_Type_Empty;
             if (M50CardHelper.NewCard(newCard) == true)
             {
-                MessageBox.Show("建卡成功!");
+                MessageBox.Show(string.Format(CardErrorTips.Mat_MakeSucc, ((CardType)newCard.CardType).GetDescription()));
             }
             else
             {
-                MessageBox.Show("建卡失败!");
+                MessageBox.Show(string.Format(CardErrorTips.Mat_MakeFail, ((CardType)newCard.CardType).GetDescription()));
             }
         }
 
@@ -829,11 +832,11 @@ namespace ISSUDemoCrypto
             newCard.CardType = (byte)CardType.Card_Type_Binding_Mother;
             if (M50CardHelper.NewCard(newCard) == true)
             {
-                MessageBox.Show("建卡成功!");
+                MessageBox.Show(string.Format(CardErrorTips.Mat_MakeSucc, ((CardType)newCard.CardType).GetDescription()));
             }
             else
             {
-                MessageBox.Show("建卡失败!");
+                MessageBox.Show(string.Format(CardErrorTips.Mat_MakeFail, ((CardType)newCard.CardType).GetDescription()));
             }
         }
 
@@ -879,11 +882,11 @@ namespace ISSUDemoCrypto
                 newCard.Param[5] = byServerPort[1];
                 if (M50CardHelper.NewCard(newCard) == true)
                 {
-                    MessageBox.Show("设置成功!");
+                    MessageBox.Show(string.Format(CardErrorTips.Mat_MakeSucc, ((CardType)newCard.CardType).GetDescription()));
                 }
                 else
                 {
-                    MessageBox.Show("设置失败!");
+                    MessageBox.Show(string.Format(CardErrorTips.Mat_MakeFail, ((CardType)newCard.CardType).GetDescription()));
                 }
             }
             catch (System.Exception ex)
@@ -927,11 +930,11 @@ namespace ISSUDemoCrypto
                 }
                 if (M50CardHelper.NewCard(newCard) == true)
                 {
-                    MessageBox.Show("设置成功!");
+                    MakeCardErrorTip(true, card);
                 }
                 else
                 {
-                    MessageBox.Show("设置失败!");
+                    MakeCardErrorTip(false, card);
                 }
             }
             catch (System.Exception ex)
@@ -968,11 +971,11 @@ namespace ISSUDemoCrypto
                 newCard.Param[0] = btCommType;
                 if (M50CardHelper.NewCard(newCard) == true)
                 {
-                    MessageBox.Show("设置成功!");
+                    MakeCardErrorTip(true, card);
                 }
                 else
                 {
-                    MessageBox.Show("设置失败!");
+                    MakeCardErrorTip(false, card);
                 }
             }
             catch (System.Exception ex)
@@ -1025,11 +1028,11 @@ namespace ISSUDemoCrypto
 
                 if (M50CardHelper.NewCard(newCard) == true)
                 {
-                    MessageBox.Show("设置成功!");
+                    MakeCardErrorTip(true, newCard);
                 }
                 else
                 {
-                    MessageBox.Show("设置失败!");
+                    MakeCardErrorTip(false, newCard);
                 }
             }
             catch (System.Exception ex)
@@ -1069,12 +1072,12 @@ namespace ISSUDemoCrypto
                 bRet = M50CardHelper.SetPassword(7 + 8);
                 if (bRet)
                 {
-                    MessageBox.Show("修改密码成功!");
+                    MessageBox.Show(CardErrorTips.ChangePassWordSucc);
                     return;
                 }
             }
 
-            MessageBox.Show("修改密码失败!");
+            MessageBox.Show(CardErrorTips.ChangePassWordFail);
         }
 
        
@@ -1090,7 +1093,7 @@ namespace ISSUDemoCrypto
 
             if(m_BindingCardInfo.CardType != (byte)CardType.Card_Type_Binding_Mother)
             {
-                MessageBox.Show("请进行秘钥验证");
+                MessageBox.Show(CardErrorTips.CheckPowerOff);
                 return;
             }
 
@@ -1136,11 +1139,11 @@ namespace ISSUDemoCrypto
 
             if (M50CardHelper.NewCard(newCard) == true)
             {
-                MessageBox.Show(strText + "制作成功!");
+                MakeCardErrorTip(true, newCard);
             }
             else
             {
-                MessageBox.Show(strText + "制作失败!");
+                MakeCardErrorTip(false, newCard);
             }
         }
 
@@ -1153,12 +1156,12 @@ namespace ISSUDemoCrypto
                 bRet = M50CardHelper.CleanPassword(7 + 8);
                 if (bRet)
                 {
-                    MessageBox.Show("清除密码成功!");
+                    MessageBox.Show(CardErrorTips.CleanPassWordSucc);
                     return;
                 }
             }
 
-            MessageBox.Show("清除密码失败!");
+            MessageBox.Show(CardErrorTips.CleanPassWordFail);
         }
         
         private void cbox_EmMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1209,7 +1212,7 @@ namespace ISSUDemoCrypto
                 string strBandingGene = tbox_BandingGene.Text.Trim();
                 if (strBandingGene.Length != 8)
                 {
-                    MessageBox.Show("密码长度必须等于8.");
+                    MessageBox.Show(CardErrorTips.PassWordLengthError);
                     return;
                 }
 
@@ -1219,11 +1222,11 @@ namespace ISSUDemoCrypto
                 Array.Copy(genes, newCard.Gens, 8);
                 if (M50CardHelper.NewCard(newCard) == true)
                 {
-                    MessageBox.Show("管理秘钥卡制作成功!");
+                    MakeCardErrorTip(true, newCard);
                     tbox_BandingGene.Text = "";
                     return;
                 }
-                MessageBox.Show("管理秘钥卡制作失败!");
+                MakeCardErrorTip(false, newCard);
             }
             catch (System.Exception ex)
             {
@@ -1239,7 +1242,7 @@ namespace ISSUDemoCrypto
                 string strKeyGene = "";//tbox_KeyGene.Text.Trim();
                 if (strKeyGene.Length != 8)
                 {
-                    MessageBox.Show("用户基因长度必须等于8.");
+                    MessageBox.Show(CardErrorTips.PassWordLengthError);
                     return;
                 }
 
@@ -1249,10 +1252,10 @@ namespace ISSUDemoCrypto
                 Array.Copy(genes, newCard.Gens, 8);
                 if (M50CardHelper.NewCard(newCard) == true)
                 {
-                    MessageBox.Show("秘钥卡制作成功!");
+                    MakeCardErrorTip(true, newCard);
                     return;
                 }
-                MessageBox.Show("秘钥卡制作失败!");
+                MakeCardErrorTip(false, newCard);
             }
             catch (System.Exception ex)
             {
@@ -1322,14 +1325,14 @@ namespace ISSUDemoCrypto
                 {
                     if(tips)
                     {
-                        MessageBox.Show("密码清除成功");
+                        MessageBox.Show(CardErrorTips.CleanPassWordSucc);
                     }
                     return true;
                 }
             }
             if(tips)
             {
-                MessageBox.Show("密码清除失败");
+                MessageBox.Show(CardErrorTips.CleanPassWordFail);
             }
             return false;
         }
@@ -1420,7 +1423,7 @@ namespace ISSUDemoCrypto
             string strid = "";
             if(M50CardHelper.ReadCardNum(out strid) == false)
             {
-                MessageBox.Show("请放入卡片并打开串口");
+                MessageBox.Show(CardErrorTips.UnReadCardNum);
                 return;
             }
 
@@ -1428,17 +1431,29 @@ namespace ISSUDemoCrypto
             AddPsw();
             if(M50CardHelper.InitCard() == false)
             {
-                MessageBox.Show("卡格式化失败");
+                MessageBox.Show(CardErrorTips.InitFail);
                 return;
             }
             CardInfo card = new CardInfo();
             object obj = (object)card;
             if(M50CardHelper.NewCard(obj) == false)
             {
-                MessageBox.Show("卡格式化失败");
+                MessageBox.Show(CardErrorTips.InitFail);
                 return;
             }
-            MessageBox.Show("卡格式化成功");
+            MessageBox.Show(CardErrorTips.InitSucc);
+        }
+
+        public void MakeCardErrorTip(bool succ, CardInfo card)
+        {
+            if(succ)
+            {
+                MessageBox.Show(string.Format(CardErrorTips.Mat_MakeSucc, ((CardType)card.CardType).GetDescription()));
+            }
+            else
+            {
+                MessageBox.Show(string.Format(CardErrorTips.Mat_MakeFail, ((CardType)card.CardType).GetDescription()));
+            }
         }
 
     }

@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISSUDemoCrypto", "ISSUDemoCrypto.csproj", "{C5B6C160-B036-44AD-8A5D-1E4E543A2BBF}"
 EndProject
+Project("{6141683F-8A12-4E36-9623-2EB02B2C2303}") = "Setup1", "..\Setup1\Setup1.isproj", "{B49ACABC-A465-49EC-9C69-28F3C46EBD45}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CD_ROM|x86 = CD_ROM|x86
@@ -24,6 +26,16 @@ Global
 		{C5B6C160-B036-44AD-8A5D-1E4E543A2BBF}.Release|x86.Build.0 = Release|x86
 		{C5B6C160-B036-44AD-8A5D-1E4E543A2BBF}.SingleImage|x86.ActiveCfg = Release|x86
 		{C5B6C160-B036-44AD-8A5D-1E4E543A2BBF}.SingleImage|x86.Build.0 = Release|x86
+		{B49ACABC-A465-49EC-9C69-28F3C46EBD45}.CD_ROM|x86.ActiveCfg = CD_ROM
+		{B49ACABC-A465-49EC-9C69-28F3C46EBD45}.CD_ROM|x86.Build.0 = CD_ROM
+		{B49ACABC-A465-49EC-9C69-28F3C46EBD45}.Debug|x86.ActiveCfg = DVD-5
+		{B49ACABC-A465-49EC-9C69-28F3C46EBD45}.Debug|x86.Build.0 = DVD-5
+		{B49ACABC-A465-49EC-9C69-28F3C46EBD45}.DVD-5|x86.ActiveCfg = DVD-5
+		{B49ACABC-A465-49EC-9C69-28F3C46EBD45}.DVD-5|x86.Build.0 = DVD-5
+		{B49ACABC-A465-49EC-9C69-28F3C46EBD45}.Release|x86.ActiveCfg = SingleImage
+		{B49ACABC-A465-49EC-9C69-28F3C46EBD45}.Release|x86.Build.0 = SingleImage
+		{B49ACABC-A465-49EC-9C69-28F3C46EBD45}.SingleImage|x86.ActiveCfg = SingleImage
+		{B49ACABC-A465-49EC-9C69-28F3C46EBD45}.SingleImage|x86.Build.0 = SingleImage
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
