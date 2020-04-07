@@ -37,7 +37,9 @@
                             <TextBlock Grid.Row="0" TextWrapping="Wrap" Margin="3" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="Blue"
                                        Text="卡格式化流程" 
                                        />
-                            <TextBlock TextWrapping="Wrap" Grid.Row="1" Margin="3" HorizontalAlignment="Center" >
+                           
+                            <StackPanel Grid.Row="1">
+                                <TextBlock TextWrapping="Wrap" Grid.Row="1" Margin="3" HorizontalAlignment="Center" >
                                 一.选择对应串口，波特率115200，以及加密版，然后单击 <Run Foreground="Red" FontSize="18" Text ="打开串口"/> <LineBreak/>
                                                                  <Run Foreground="Red" Text ="                                      ↓"/> <LineBreak/>
                                                                  <Run Foreground="Red" Text ="                                      ↓"/> <LineBreak/>
@@ -46,17 +48,24 @@
                                                                  <Run Foreground="Red" Text ="                                      →"/> <LineBreak/>
                                                                  <Run Foreground="Red" Text ="                                      →"/> <LineBreak/>
                                                                  <Run Foreground="Red" Text ="                                      →"/> <LineBreak/>
-           
-                            </TextBlock>
-                        </Grid>
+                                </TextBlock>
 
+                                <TextBlock Grid.Row="1" TextWrapping="Wrap" Margin="3" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="Red"
+                                       Text="使用提示" 
+                                       />
+                            <TextBlock Grid.Row="1" TextWrapping="Wrap" Margin="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                1.串口只需要打开一次<LineBreak/>
+                                2.如果串口无法打开，请尝试切换串口COM或安装驱动程序<LineBreak/>
+                                3.秘钥验证之后不需要再次验证<LineBreak/>
+                                4.如果卡片无法识别，请尝试将卡片格式化处理<LineBreak/>
+                            </TextBlock>
+                            </StackPanel>
+                        </Grid>
                     </GroupBox>
 
                     <GroupBox Grid.Column="1" Margin="5" Header="卡格式化" BorderBrush="Green">
                         <Grid Margin="5">
                             <StackPanel Orientation="Vertical" VerticalAlignment="Top">
-
-
                                 <StackPanel  Orientation="Horizontal" HorizontalAlignment="Left" Height="35" Margin="5">
                                     <TextBlock Text="卡片格式化:" VerticalAlignment="Center" />
                                     <TextBlock Width="80"/>

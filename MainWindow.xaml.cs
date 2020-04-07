@@ -92,7 +92,6 @@ namespace ISSUDemoCrypto
                 {
                     MessageBox.Show(CardErrorTips.InputMoneyFail);
                 }
-
             }
             catch (System.Exception ex)
             {
